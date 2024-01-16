@@ -13,7 +13,7 @@
  <div class="col-md">
  <div class="box-titulo">
  <div class="box-titulo-item">
- <img src="">
+ <img src="{% static 'usuarios/img/logo.png' %}">
  </div>
 <div style="margin-top: auto; margin-bottom: auto;" class="box-titulo-item">
  <h3 >Study.Async</h3>
@@ -37,7 +37,16 @@
  </div>
 <br>
 <h3>Cadastre-se</h3>
- <form action="" method="POST">
+
+{% if messages %}
+    {% for message in messages %}
+        <section class="alert {{message.tags}}">
+            {{message}}
+        </section>
+    {% endfor %}
+{%endif%}
+
+ <form action="{% url 'cadastro' %}" method="POST">{% csrf_token %}
  <label>Username</label>
  <input type="text" class="input-form" name="username" id="">
  <br>
