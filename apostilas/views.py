@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Apostila
+from .models import Apostila, ViewApostila
 from django.contrib.messages import constants
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -7,7 +7,8 @@ from django.shortcuts import redirect
 def adicionar_apostilas(request):
     if request.method == 'GET':
         apostilas = Apostila.objects.filter(user=request.user)
-        return render(request, 'adicionar_apostilas.html', {'apostilas': apostilas})
+        views_totais = ViewApostila.objects.filter(apostila__user = request.user).count()
+        return render(request, 'adicionar_apostilas.html', {'apostilas': apostilas, 'views_totais': views_totais})
     
     elif request.method == 'POST':
         titulo = request.POST.get('titulo')
@@ -19,3 +20,16 @@ def adicionar_apostilas(request):
             request, constants.SUCCESS, 'Apostila adicionada com sucesso.'
         )
         return redirect('/apostilas/adicionar_apostilas/')
+
+def apostila(request, id):
+    apostila = Apostila.objects.get(id=id)
+
+    views_totais = ViewApostila.objects.filter(apostila=apostila).count()
+    views_unicas = ViewApostila.objects.filter(apostila=apostila).values('ip').distinct().count()
+    
+    view = ViewApostila(ip=request.META['REMOTE_ADDR'],apostila=apostila)
+    view.save()
+
+    return render(request, 'apostila.html', {'apostila': apostila,
+                                             'views_unicas': views_unicas,
+                                             'views_totais': views_totais})
